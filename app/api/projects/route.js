@@ -2,6 +2,7 @@ import { createProject, getProjects, isExistByName } from '@/lib/db/projects';
 import { createInitModelConfig, getModelConfigByProjectId } from '@/lib/db/model-config';
 
 export async function POST(request) {
+  console.log("/api/projects: create project \n %o",request);
   try {
     const projectData = await request.json();
     // 验证必要的字段

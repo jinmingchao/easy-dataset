@@ -3,6 +3,7 @@ import { createLlmModels, getLlmModelsByProviderId } from '@/lib/db/llm-models';
 
 // 获取LLM模型
 export async function GET(request) {
+  console.log("调用 /api/llm/model - request: \n %o",request);
   try {
     const searchParams = request.nextUrl.searchParams;
     let providerId = searchParams.get('providerId');

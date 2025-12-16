@@ -85,6 +85,8 @@ export default function ModelSettings({ projectId }) {
         id: provider.id,
         label: provider.name
       }));
+      console.log('response.data[0]', response.data[0]);
+      console.log('providerOptions', providerOptions);
       setSelectedProvider(response.data[0]);
       getProviderModels(response.data[0].id);
       setProviderOptions(providerOptions);
@@ -150,6 +152,7 @@ export default function ModelSettings({ projectId }) {
         setModels(response.data);
       })
       .catch(error => {
+        console.error("获取模型列表失败 - providerId: %s", providerId)
         toast.error('Get Models Error');
       });
   };

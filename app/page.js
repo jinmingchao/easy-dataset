@@ -26,7 +26,7 @@ export default function Home() {
         setLoading(true);
         // 获取用户创建的项目详情
         const response = await fetch(`/api/projects`);
-
+        // prompt("hello world")
         if (!response.ok) {
           throw new Error(t('projects.fetchFailed'));
         }
