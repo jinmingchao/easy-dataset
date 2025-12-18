@@ -3,9 +3,12 @@ import axios from 'axios';
 
 // 从模型提供商获取模型列表
 export async function POST(request) {
+  console.log("调用 /api/llm/fetch-models - request: \n %o",request);
   try {
     const { endpoint, providerId, apiKey } = await request.json();
-
+    console.log("/api/llm/fetch-models - endpoint: \n %o",endpoint);
+    console.log("/api/llm/fetch-models - providerId: \n %o",providerId);
+    console.log("/api/llm/fetch-models - apiKey: \n %o",apiKey);
     if (!endpoint) {
       return NextResponse.json({ error: '缺少 endpoint 参数' }, { status: 400 });
     }
@@ -32,7 +35,7 @@ export async function POST(request) {
     }
 
     const response = await axios.get(url, { headers });
-
+    console.log("/api/llm/fetch-models - response: \n %o",response);
     // 根据不同提供商格式化返回数据
     let formattedModels = [];
     if (providerId === 'ollama') {

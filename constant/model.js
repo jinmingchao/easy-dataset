@@ -73,6 +73,12 @@ export const MODEL_PROVIDERS = [
     name: '阿里云百炼',
     defaultEndpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     defaultModels: ['qwen-max-latest', 'qwen-max-2025-01-25']
+  },
+  {
+    id:'中国邮政',
+    name:'中国邮政业财大模型-Qwen2.5VL-72B',
+    defaultEndpoint: 'http://10.1.153.200:8088/General/haproxy-othvllm/qwen72vl/v1/chat/completions?AccessCode=45BBBD2F200C862DD2C1F86368C32783',
+    defaultModels: ['qwen-vl-2.5'],
   }
 ];
 

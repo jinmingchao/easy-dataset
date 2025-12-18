@@ -70,9 +70,13 @@ export default function ModelSettings({ projectId }) {
     topK: 0,
     status: 1
   });
+  // useEffect(() => {
+  //   console.log('当前的 providerOptions 内容:', providerOptions);
+  // }, [providerOptions]);
 
   useEffect(() => {
     getProvidersList();
+    console.log('当前的 providerOptions 内容:', providerOptions);
     getModelConfigList();
   }, []);
 
@@ -86,10 +90,12 @@ export default function ModelSettings({ projectId }) {
         label: provider.name
       }));
       console.log('response.data[0]', response.data[0]);
-      console.log('providerOptions', providerOptions);
       setSelectedProvider(response.data[0]);
       getProviderModels(response.data[0].id);
+      console.log('providerOptions', providerOptions);
       setProviderOptions(providerOptions);
+      console.log('providerOptions-2', providerOptions);
+
     });
   };
 
