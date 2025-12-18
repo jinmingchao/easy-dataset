@@ -53,7 +53,7 @@ export async function POST(request, { params }) {
             'Content-Type': 'application/json'
           }
         });
-        console.log('POST 响应:', response.data);
+        console.log('POST 响应:', JSON.stringify(response.data, null, 2));
         // const jsonData = await response.json();
         const res = `${response.data.choices[0].message.content}`;
         return NextResponse.json({res});
