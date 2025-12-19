@@ -127,6 +127,7 @@ export default function useModelPlayground(projectId, defaultModelId = null) {
     // 为每个模型单独发送请求
     selectedModels.forEach(async modelId => {
       const model = availableModels.find(m => m.id === modelId);
+      console.log("model:" + model)
       if (!model) {
         // 模型配置不存在
         const modelConversation = [...(updatedConversations[modelId] || [])];
@@ -311,11 +312,11 @@ export default function useModelPlayground(projectId, defaultModelId = null) {
 
           // 获取响应数据
           const data = await response.json();
-
+          console.log("data:" + data);
           // 独立更新此模型的对话状态
           setConversations(prev => {
             const modelConversation = [...(prev[modelId] || [])];
-
+            console.log("modelConversation:" + modelConversation);
             if (response.ok) {
               // 处理可能包含思考链的内容
               let thinking = '';

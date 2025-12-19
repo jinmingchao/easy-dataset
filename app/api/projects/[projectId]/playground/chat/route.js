@@ -27,7 +27,43 @@ export async function POST(request, { params }) {
     if (model.endpoint === 'http://10.1.153.200:8088/General/haproxy-othvllm/qwen72vl/v1/chat/completions?AccessCode=45BBBD2F200C862DD2C1F86368C32783') {
       console.log("调用 /api/projects/[projectId]/playground/chat - 调用中国邮政业财大模型-Qwen2.5VL-72");
       let response = '';
-      const user_msg = messages[0].content
+
+      // 提取user角色的消息，最多保留5条
+      const user_msg = messages.reduce((acc, item) => {
+        // 判断当前项的role是否为user
+        if (item.role === 'user') {
+          // 添加到结果数组
+          acc.push(item.content);
+          // 如果超过5条，删除第一条
+          if (acc.length > 5) {
+            acc.shift();
+          }
+        }
+        return acc;
+      }, []); // 初始值为空数组
+
+      // console.log(msg);
+      // 输出: ['消息2', '消息3', '消息4', '消息5', '消息6']
+
+      // const user_msg = messages[0].content
+      // let send_msg = {
+      //   "model": "Qwen2.5-VL-72B",
+      //   "messages": [
+      //     {
+      //       "role": "user",
+      //       "content": [
+      //         {
+      //           "type": "text",
+      //           "text": user_msg
+      //         }
+      //       ]
+      //     }
+      //   ],
+      //   "temperature": 0.6,
+      //   "top_p": 0.8,
+      //   "max_tokens": 1024,
+      //   "stream": false
+      // }
       let send_msg = {
         "model": "Qwen2.5-VL-72B",
         "messages": [
