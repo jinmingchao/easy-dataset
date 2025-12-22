@@ -312,7 +312,8 @@ export default function useModelPlayground(projectId, defaultModelId = null) {
 
           // 获取响应数据
           const data = await response.json();
-          console.log("data:" + data);
+          console.dir("data:");
+          console.dir(data,{depth: null});
           // 独立更新此模型的对话状态
           setConversations(prev => {
             const modelConversation = [...(prev[modelId] || [])];
@@ -330,7 +331,8 @@ export default function useModelPlayground(projectId, defaultModelId = null) {
                   content = thinkParts.filter((_, i) => i % 2 === 0).join('');
                 }
               }
-              console.log("modelConversation:" + modelConversation);
+              console.dir("modelConversation:");
+              console.dir(modelConversation,{depth: null});
               return {
                 ...prev,
                 [modelId]: [

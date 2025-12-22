@@ -34,8 +34,8 @@ export async function POST(request, { params }) {
       messages.forEach(message => {
         if (message.role === 'user') {
           user_messages.push({"type": "text", "text":message.content})
-        } else if (message.role === 'user') {
-          user_messages.push({"type": "text", "text":message.content})
+        } else if (message.role === 'assistant') {
+          ai_messages.push({"type": "text", "text":message.content})
         }
         if (user_messages.length > 5) {
           user_messages.shift();
@@ -44,7 +44,7 @@ export async function POST(request, { params }) {
           ai_messages.shift();
         }
       })
-      console.log("调用 /api/projects/[projectId]/playground/chat - user_messages: \n %o \n ------ \n ai_messages \n %o",user_messages, ai_messages);
+      console.log("调用 /api/projects/[projectId]/playground/chat \n user_messages: \n %o \n ------ \n ai_messages \n %o",user_messages, ai_messages);
       // console.log(msg);
       // 输出: ['消息2', '消息3', '消息4', '消息5', '消息6']
 
@@ -72,12 +72,7 @@ export async function POST(request, { params }) {
         "messages": [
           {
             "role": "user",
-            "content": [
-              {
-                "type": "text",
-                "text": user_messages
-              }
-            ]
+            "content": user_messages
           },
           {
             "role": "assistant",
@@ -86,20 +81,20 @@ export async function POST(request, { params }) {
         ],
         "temperature": 0.6,
         "top_p": 0.8,
-        "max_tokens": 1024,
+        "max_tokens": 4096,
         "stream": false
       }
       console.log("调用 /api/projects/[projectId]/playground/chat - send_msg: \n %o ",send_msg);
       try {
-        const response = await axios.post('http://10.1.153.200:8088/General/haproxy-othvllm/qwen72vl/v1/chat/completions?AccessCode=45BBBD2F200C862DD2C1F86368C32783', send_msg, {
+        const resp = await axios.post('http://10.1.153.200:8088/General/haproxy-othvllm/qwen72vl/v1/chat/completions?AccessCode=45BBBD2F200C862DD2C1F86368C32783', send_msg, {
           headers: {
             'Content-Type': 'application/json'
           }
         });
-        console.log('POST 响应:', JSON.stringify(response.data, null, 2));
+        console.log('POST 响应:', JSON.stringify(resp.data, null, 2));
         // const jsonData = await response.json();
-        const res = `${response.data.choices[0].message.content}`;
-        return NextResponse.json({res});
+        const response = `${resp.data.choices[0].message.content}`;
+        return NextResponse.json({response});
       } catch (error) {
         console.error('POST 失败:', error.message);
       }

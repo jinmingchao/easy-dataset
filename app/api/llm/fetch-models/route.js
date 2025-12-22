@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { CUSTOM_MODEL_CONFIG } from '@/constant/global_const';
 
 // 从模型提供商获取模型列表
 export async function POST(request) {
@@ -25,31 +26,44 @@ export async function POST(request) {
         url += '/api';
       }
       url += '/tags';
+    } else if (providerId === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID && endpoint === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_BASEURL) {
+      //doNothing
     } else {
       url += '/models';
     }
+    let response = null
+    if (providerId === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID && endpoint === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_BASEURL) {
+      //doNothing
+    } else {
+      const headers = {};
+      if (apiKey) {
+        headers.Authorization = `Bearer ${apiKey}`;
+      }
 
-    const headers = {};
-    if (apiKey) {
-      headers.Authorization = `Bearer ${apiKey}`;
+      response = await axios.get(url, { headers });
+      console.log("/api/llm/fetch-models - response: \n %o",response);
     }
 
-    const response = await axios.get(url, { headers });
-    console.log("/api/llm/fetch-models - response: \n %o",response);
     // 根据不同提供商格式化返回数据
     let formattedModels = [];
     if (providerId === 'ollama') {
       // Ollama /api/tags 返回的格式: { models: [{ name: 'model-name', ... }] }
-      if (response.data.models && Array.isArray(response.data.models)) {
+      if (response !== null && response.data.models && Array.isArray(response.data.models)) {
         formattedModels = response.data.models.map(item => ({
           modelId: item.name,
           modelName: item.name,
           providerId
         }));
       }
+    } else if (providerId === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID && endpoint === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_BASEURL) {
+      formattedModels.push({
+        modelId: 'chinapost-qwen2.5-vl',
+        modelName: 'chinapost-qwen2.5-vl',
+        providerId: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID
+      })
     } else {
       // 默认处理方式（適用于 OpenAI 等）
-      if (response.data.data && Array.isArray(response.data.data)) {
+      if (response !== null && response.data.data && Array.isArray(response.data.data)) {
         formattedModels = response.data.data.map(item => ({
           modelId: item.id,
           modelName: item.id,
@@ -57,7 +71,7 @@ export async function POST(request) {
         }));
       }
     }
-
+    console.log("/api/llm/fetch-models - formattedModels: \n %o",formattedModels);
     return NextResponse.json(formattedModels);
   } catch (error) {
     console.error('获取模型列表失败:', String(error));
