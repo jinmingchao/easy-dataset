@@ -29,19 +29,22 @@ export async function POST(request, { params }) {
       let response = '';
 
       // 提取user角色的消息，最多保留5条
-      const user_msg = messages.reduce((acc, item) => {
-        // 判断当前项的role是否为user
-        if (item.role === 'user') {
-          // 添加到结果数组
-          acc.push(item.content);
-          // 如果超过5条，删除第一条
-          if (acc.length > 5) {
-            acc.shift();
-          }
+      const ai_messages = []
+      const user_messages = []
+      messages.forEach(message => {
+        if (message.role === 'user') {
+          user_messages.push({"type": "text", "text":message.content})
+        } else if (message.role === 'user') {
+          user_messages.push({"type": "text", "text":message.content})
         }
-        return acc;
-      }, []); // 初始值为空数组
-
+        if (user_messages.length > 5) {
+          user_messages.shift();
+        }
+        if (ai_messages.length > 5) {
+          ai_messages.shift();
+        }
+      })
+      console.log("调用 /api/projects/[projectId]/playground/chat - user_messages: \n %o \n ------ \n ai_messages \n %o",user_messages, ai_messages);
       // console.log(msg);
       // 输出: ['消息2', '消息3', '消息4', '消息5', '消息6']
 
@@ -72,9 +75,13 @@ export async function POST(request, { params }) {
             "content": [
               {
                 "type": "text",
-                "text": user_msg
+                "text": user_messages
               }
             ]
+          },
+          {
+            "role": "assistant",
+            "content": ai_messages
           }
         ],
         "temperature": 0.6,

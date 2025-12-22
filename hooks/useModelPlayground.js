@@ -316,7 +316,6 @@ export default function useModelPlayground(projectId, defaultModelId = null) {
           // 独立更新此模型的对话状态
           setConversations(prev => {
             const modelConversation = [...(prev[modelId] || [])];
-            console.log("modelConversation:" + modelConversation);
             if (response.ok) {
               // 处理可能包含思考链的内容
               let thinking = '';
@@ -331,7 +330,7 @@ export default function useModelPlayground(projectId, defaultModelId = null) {
                   content = thinkParts.filter((_, i) => i % 2 === 0).join('');
                 }
               }
-
+              console.log("modelConversation:" + modelConversation);
               return {
                 ...prev,
                 [modelId]: [
