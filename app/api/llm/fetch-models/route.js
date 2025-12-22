@@ -57,8 +57,8 @@ export async function POST(request) {
       }
     } else if (providerId === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID && endpoint === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_BASEURL) {
       formattedModels.push({
-        modelId: 'chinapost-qwen2.5-vl',
-        modelName: 'chinapost-qwen2.5-vl',
+        modelId: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_MODELNAME,
+        modelName: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_MODELNAME,
         providerId: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID
       })
     } else {
