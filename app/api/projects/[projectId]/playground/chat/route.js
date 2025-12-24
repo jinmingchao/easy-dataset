@@ -29,22 +29,25 @@ export async function POST(request, { params }) {
       let response = '';
 
       // 提取user角色的消息，最多保留5条
-      const ai_messages = []
-      const user_messages = []
+      const raw_messages = []
+
       messages.forEach(message => {
-        if (message.role === 'user') {
-          user_messages.push({"type": "text", "text":message.content})
-        } else if (message.role === 'assistant') {
-          ai_messages.push({"type": "text", "text":message.content})
+        if (message.role === 'user' || message.role === 'assistant') {
+          const msg = {
+            "role":message.role,
+            "content":[
+              {"type": "text", "text":message.content}
+            ]
+          }
+          raw_messages.push(msg)
+          // user_messages.push({"type": "text", "text":message.content})
         }
-        if (user_messages.length > 5) {
-          user_messages.shift();
-        }
-        if (ai_messages.length > 5) {
-          ai_messages.shift();
+
+        if (raw_messages.length > 10) {
+          raw_messages.shift();
         }
       })
-      console.log("调用 /api/projects/[projectId]/playground/chat \n user_messages: \n %o \n ------ \n ai_messages \n %o",user_messages, ai_messages);
+      console.log("调用 /api/projects/[projectId]/playground/chat \n raw_messages: \n %o \n",raw_messages);
       // console.log(msg);
       // 输出: ['消息2', '消息3', '消息4', '消息5', '消息6']
 
@@ -67,21 +70,29 @@ export async function POST(request, { params }) {
       //   "max_tokens": 1024,
       //   "stream": false
       // }
+      // let send_msg = {
+      //   "model": "Qwen2.5-VL-72B",
+      //   "messages": [
+      //     {
+      //       "role": "user",
+      //       "content": user_messages
+      //     },
+      //     {
+      //       "role": "assistant",
+      //       "content": ai_messages
+      //     }
+      //   ],
+      //   "temperature": 0.6,
+      //   "top_p": 0.8,
+      //   "max_tokens": 4096,
+      //   "stream": false
+      // }
       let send_msg = {
         "model": "Qwen2.5-VL-72B",
-        "messages": [
-          {
-            "role": "user",
-            "content": user_messages
-          },
-          {
-            "role": "assistant",
-            "content": ai_messages
-          }
-        ],
+        "messages": raw_messages,
         "temperature": 0.6,
         "top_p": 0.8,
-        "max_tokens": 4096,
+        "max_tokens": 16000,
         "stream": false
       }
       console.log("调用 /api/projects/[projectId]/playground/chat - send_msg: \n %o ",send_msg);
