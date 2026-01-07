@@ -5,6 +5,10 @@ import { CUSTOM_MODEL_CONFIG } from '@/constant/global_const';
 // 从模型提供商获取模型列表
 export async function POST(request) {
   console.log("调用 /api/llm/fetch-models - request: \n %o",request);
+  const chinapostProviderIds = new Set([
+    CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID,
+    CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_PROVIDERID
+  ])
   try {
     const { endpoint, providerId, apiKey } = await request.json();
     console.log("/api/llm/fetch-models - endpoint: \n %o",endpoint);
@@ -26,13 +30,13 @@ export async function POST(request) {
         url += '/api';
       }
       url += '/tags';
-    } else if (providerId === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID && endpoint === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_BASEURL) {
+    } else if (chinapostProviderIds.has(providerId)) {
       //doNothing
     } else {
       url += '/models';
     }
     let response = null
-    if (providerId === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID && endpoint === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_BASEURL) {
+    if (chinapostProviderIds.has(providerId)) {
       //doNothing
     } else {
       const headers = {};
@@ -55,12 +59,30 @@ export async function POST(request) {
           providerId
         }));
       }
-    } else if (providerId === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID && endpoint === CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_BASEURL) {
-      formattedModels.push({
-        modelId: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_MODELNAME,
-        modelName: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_MODELNAME,
-        providerId: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID
-      })
+    } else if (chinapostProviderIds.has(providerId)) {
+      switch (providerId) {
+        case CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID:
+          formattedModels.push({
+            modelId: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_MODELNAME,
+            modelName: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_MODELNAME,
+            providerId: CUSTOM_MODEL_CONFIG.CHINAPOST_QWEN25VL_PROVIDERID
+          })
+          break;
+        case CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_PROVIDERID:
+          formattedModels.push({
+            modelId: CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_QWEN3_14B_MODELID,
+            modelName: CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_QWEN3_14B_MODELNAME,
+            providerId: CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_PROVIDERID
+          })
+          break;
+        default:
+          return NextResponse.json(
+              { error: `中国邮政大模型 - 获取模型列表失败: 未找到供应商id` },
+              { status: error.response.status }
+          );
+
+      }
+
     } else {
       // 默认处理方式（適用于 OpenAI 等）
       if (response !== null && response.data.data && Array.isArray(response.data.data)) {

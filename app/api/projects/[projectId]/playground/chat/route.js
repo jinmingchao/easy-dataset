@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import LLMClient from '@/lib/llm/core/index';
 import axios from "axios";
+import {CUSTOM_MODEL_CONFIG} from "@/constant/global_const";
 
 export async function POST(request, { params }) {
   console.log("调用 /api/projects/[projectId]/playground/chat - request: \n %o \n ------ \n params \n %o",request,{ params });
@@ -47,7 +48,7 @@ export async function POST(request, { params }) {
           raw_messages.shift();
         }
       })
-      console.log("调用 /api/projects/[projectId]/playground/chat \n raw_messages: \n %o \n",raw_messages);
+      console.log("调用 /api/projects/[projectId]/playground/chat - 调用中国邮政业财大模型-Qwen2.5VL-72\n raw_messages: \n %o \n",raw_messages);
       // console.log(msg);
       // 输出: ['消息2', '消息3', '消息4', '消息5', '消息6']
 
@@ -95,7 +96,7 @@ export async function POST(request, { params }) {
         "max_tokens": 16000,
         "stream": false
       }
-      console.log("调用 /api/projects/[projectId]/playground/chat - send_msg: \n %o ",send_msg);
+      console.log("调用 /api/projects/[projectId]/playground/chat - 调用中国邮政业财大模型-Qwen2.5VL-72 - send_msg: \n %o ",send_msg);
       try {
         const resp = await axios.post('http://10.1.153.200:8088/General/haproxy-othvllm/qwen72vl/v1/chat/completions?AccessCode=45BBBD2F200C862DD2C1F86368C32783', send_msg, {
           headers: {
@@ -110,6 +111,52 @@ export async function POST(request, { params }) {
         console.error('POST 失败:', error.message);
       }
 
+    } else if (model.modelId === CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_QWEN3_14B_MODELID) { // 邮政阿里云百炼 qwen3-14B
+      console.log("调用 /api/projects/[projectId]/playground/chat - 调用中国邮政百炼平台-qwen3-14B");
+      let response = '';
+
+      // 提取user角色的消息，最多保留5条
+      const raw_messages = []
+
+      messages.forEach(message => {
+        if (message.role === 'user' || message.role === 'assistant') {
+          const msg = {
+            "role":message.role,
+            "content":message.content
+          }
+          raw_messages.push(msg)
+          // user_messages.push({"type": "text", "text":message.content})
+        }
+
+        if (raw_messages.length > 10) {
+          raw_messages.shift();
+        }
+      })
+      console.log("调用 /api/projects/[projectId]/playground/chat - 调用中国邮政百炼平台-qwen3-14B\n raw_messages: \n %o \n",raw_messages);
+
+      let send_msg = {
+        "model": CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_QWEN3_14B_MODELID,
+        "messages": raw_messages,
+        "temperature": 0.6,
+        "top_p": 0.8,
+        "max_tokens": 32768,
+        "stream": false
+      }
+      console.log("调用 /api/projects/[projectId]/playground/chat - 调用中国邮政百炼平台-qwen3-14B - send_msg: \n %o ",send_msg);
+      try {
+        const resp = await axios.post(CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_BASEURL + '/chat/completions', send_msg, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CUSTOM_MODEL_CONFIG.CHINAPOST_BAILIAN_APIKEY}`
+          }
+        });
+        console.log('POST 响应:', JSON.stringify(resp.data, null, 2));
+        // const jsonData = await response.json();
+        const response = `${resp.data.choices[0].message.content}`;
+        return NextResponse.json({response});
+      } catch (error) {
+        console.error('POST 失败:', error.message);
+      }
     } else { //原始逻辑
       // 使用自定义的LLM客户端
       const llmClient = new LLMClient(model);
